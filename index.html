@@ -12,12 +12,8 @@ body{font-family:Arial,sans-serif;background:#f1f5f9;color:#222;font-size:13px;}
 .tab{padding:14px 20px;color:#94a3b8;cursor:pointer;font-size:14px;font-weight:600;border-bottom:3px solid transparent;}
 .tab.active{color:#fff;border-bottom:3px solid #60a5fa;}
 .tab-content{display:none;} .tab-content.active{display:block;}
-.btn-save-top{margin-left:auto;padding:8px 16px;background:#f59e0b;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;}
-.btn-save-top:hover{background:#d97706;}
-.sync-status{font-size:11px;color:#94a3b8;padding:0 12px;}
+.sync-status{font-size:11px;color:#94a3b8;padding:0 12px;margin-left:auto;}
 .sync-ok{color:#4ade80;} .sync-err{color:#f87171;} .sync-saving{color:#fbbf24;}
-
-/* LOGIN */
 .login-wrap{display:flex;align-items:center;justify-content:center;min-height:80vh;}
 .login-box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:40px;width:320px;text-align:center;}
 .login-box h2{color:#1e3a5f;margin-bottom:8px;}
@@ -25,7 +21,6 @@ body{font-family:Arial,sans-serif;background:#f1f5f9;color:#222;font-size:13px;}
 .login-box input{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;margin-bottom:12px;text-align:center;letter-spacing:2px;}
 .login-box button{width:100%;padding:10px;background:#1e3a5f;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;}
 .login-err{color:#dc2626;font-size:12px;margin-top:8px;}
-
 .admin{max-width:960px;margin:24px auto;padding:0 16px;}
 .card{background:#fff;border-radius:10px;border:1px solid #e2e8f0;margin-bottom:20px;overflow:hidden;}
 .card-head{background:#1e3a5f;color:#fff;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;}
@@ -64,8 +59,6 @@ textarea{resize:vertical;min-height:60px;}
 .upload-area input[type=file]{display:none;}
 .upload-area label{cursor:pointer;color:#2563b0;font-weight:600;text-decoration:underline;}
 .converting{color:#f59e0b;font-size:12px;margin-top:6px;}
-
-/* VIEW */
 .view{max-width:900px;margin:0 auto;padding:28px 32px;background:#fff;}
 .v-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2563b0;padding-bottom:12px;margin-bottom:6px;}
 .v-logo img{height:70px;border-radius:6px;}
@@ -90,7 +83,7 @@ textarea{resize:vertical;min-height:60px;}
 .v-unit.disp{background:#dcfce7;color:#15803d;border:1px solid #86efac;}
 .v-unit.vend{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;}
 .v-unit-num{font-size:12px;} .v-unit-val{font-size:10px;font-weight:400;margin-top:1px;}
-.v-unit-tipo{font-size:9px;font-weight:400;color:#666;margin-top:1px;}
+.v-unit-tipo{font-size:9px;font-weight:400;color:#555;margin-top:1px;}
 .v-unit-st{font-size:9px;font-weight:400;margin-top:1px;}
 .v-empr-info{display:flex;gap:16px;padding-top:8px;border-top:1px solid #e5e7eb;font-size:11px;color:#555;flex-wrap:wrap;}
 .v-empr-info span{font-weight:600;color:#222;}
@@ -101,7 +94,6 @@ textarea{resize:vertical;min-height:60px;}
 .v-footer{margin-top:20px;border-top:1px solid #e5e7eb;padding-top:8px;font-size:10px;color:#999;text-align:center;}
 .btn-print-bar{text-align:center;padding:16px;background:#f8fafc;border-top:1px solid #e2e8f0;}
 .loading{text-align:center;padding:60px;color:#94a3b8;font-size:15px;}
-
 @media print{
   .tabs,.btn-print-bar{display:none!important;}
   .tab-content{display:block!important;}
@@ -115,13 +107,11 @@ textarea{resize:vertical;min-height:60px;}
 </head>
 <body>
 
-<div class="tabs">
+<div class="tabs" id="tabs-bar">
   <div class="tab active" onclick="showTab('view',this)">&#127968; Disponibilidade</div>
-  <div class="tab" id="tab-btn-admin" onclick="abrirAdmin(this)">&#9998; Editar</div>
   <span class="sync-status" id="sync-status"></span>
 </div>
 
-<!-- VIEW (corretores) -->
 <div id="tab-view" class="tab-content active">
   <div class="view" id="view-content"><div class="loading">Carregando...</div></div>
   <div class="btn-print-bar">
@@ -129,7 +119,6 @@ textarea{resize:vertical;min-height:60px;}
   </div>
 </div>
 
-<!-- ADMIN LOGIN -->
 <div id="tab-admin" class="tab-content">
   <div id="admin-login" class="login-wrap">
     <div class="login-box">
@@ -187,8 +176,7 @@ const firebaseConfig = {
   projectId: "tmx-incorporacoes",
   storageBucket: "tmx-incorporacoes.firebasestorage.app",
   messagingSenderId: "609111606328",
-  appId: "1:609111606328:web:ad02b926ae5ebd8c4cd2cd",
-  measurementId: "G-7HGJGE4E97"
+  appId: "1:609111606328:web:ad02b926ae5ebd8c4cd2cd"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -199,52 +187,53 @@ var obras = [];
 var nextId = 1;
 var adminLogado = false;
 
-function setSyncStatus(msg, cls){
-  var el = document.getElementById('sync-status');
-  el.textContent = msg;
-  el.className = 'sync-status ' + (cls||'');
+// Detecta se é modo admin pela URL
+var isAdmin = window.location.search.includes('admin');
+if(isAdmin){
+  var tabsBar = document.getElementById('tabs-bar');
+  var adminTab = document.createElement('div');
+  adminTab.className = 'tab';
+  adminTab.innerHTML = '&#9998; Editar';
+  adminTab.onclick = function(){ abrirAdmin(this); };
+  tabsBar.insertBefore(adminTab, document.getElementById('sync-status'));
 }
 
-// Escuta mudanças em tempo real
+function setSyncStatus(msg,cls){
+  var el=document.getElementById('sync-status');
+  el.textContent=msg; el.className='sync-status '+(cls||'');
+}
+
 onValue(dbRef, function(snapshot){
-  var data = snapshot.val();
+  var data=snapshot.val();
   if(data){
-    obras = Array.isArray(data) ? data : Object.values(data);
-    nextId = obras.reduce(function(m,o){return Math.max(m,o.id||0);},0)+1;
+    obras=Array.isArray(data)?data:Object.values(data);
+    nextId=obras.reduce(function(m,o){return Math.max(m,o.id||0);},0)+1;
   } else {
-    obras = dadosIniciais();
-    salvarFirebase();
+    obras=dadosIniciais(); salvarFirebase();
   }
   renderView();
   if(adminLogado) renderAdmin();
-  setSyncStatus('● Sincronizado', 'sync-ok');
+  setSyncStatus('● Sincronizado','sync-ok');
 });
 
 function salvarFirebase(){
   setSyncStatus('Salvando...','sync-saving');
-  set(dbRef, obras).then(function(){
+  set(dbRef,obras).then(function(){
     setSyncStatus('● Sincronizado','sync-ok');
-  }).catch(function(e){
-    setSyncStatus('Erro ao salvar','sync-err');
-  });
+  }).catch(function(){setSyncStatus('Erro ao salvar','sync-err');});
 }
 
 function dadosIniciais(){
   return [
-    { id:1, nome:"São Luís 2", endereco:"Rua Congonhas do Norte", entrega:"Dez/2025", valor:219000, tipo:"2 quartos, sala, cozinha, banheiro, 1 vaga", obs:"Documentação grátis", planta:"",
-      unidades:[{n:"144",s:"vend",v:null,t:null},{n:"144A",s:"vend",v:null,t:null},{n:"144B",s:"disp",v:null,t:null},{n:"144C",s:"disp",v:null,t:null},{n:"144D",s:"disp",v:null,t:null},{n:"144E",s:"disp",v:null,t:null},{n:"144F",s:"disp",v:null,t:null},{n:"144G",s:"disp",v:null,t:null},{n:"144H",s:"vend",v:null,t:null},{n:"144I",s:"vend",v:null,t:null},{n:"144J",s:"vend",v:null,t:null},{n:"144K",s:"vend",v:null,t:null}]},
-    { id:2, nome:"Alvorada 5", endereco:"Rua Dilermando Reis, 116 — Alvorada", entrega:"Mar/2026", valor:289000, tipo:"2 quartos, sala, cozinha, banheiro social, 1 vaga", obs:"Documentação grátis", planta:"",
-      unidades:[{n:"116",s:"vend",v:null,t:null},{n:"116A",s:"disp",v:null,t:null},{n:"116B",s:"disp",v:null,t:null},{n:"116C",s:"disp",v:null,t:null},{n:"116D",s:"disp",v:null,t:null},{n:"116E",s:"disp",v:null,t:null},{n:"116F",s:"disp",v:null,t:null},{n:"116G",s:"disp",v:null,t:null},{n:"116H",s:"disp",v:null,t:null}]},
-    { id:3, nome:"São Luís 3", endereco:"Rua Congonhas do Norte", entrega:"Fev/2026", valor:310000, tipo:"2 quartos, sala, cozinha, banheiro, 1 vaga", obs:"", planta:"",
-      unidades:[{n:"Casa 01",s:"disp",v:null,t:null},{n:"Casa 02",s:"disp",v:null,t:null},{n:"Casa 03",s:"vend",v:null,t:null},{n:"Casa 04",s:"vend",v:null,t:null}]},
-    { id:4, nome:"GV4", endereco:"Rua Exemplo — Grande Vitória", entrega:"Ago/2026", valor:270000, tipo:"", obs:"", planta:"",
-      unidades:[{n:"Casa 01",s:"disp",v:null,t:null},{n:"Casa 02",s:"vend",v:null,t:null},{n:"Casa 03",s:"disp",v:null,t:null}]},
-    { id:5, nome:"SF31", endereco:"Rua Exemplo, 31 — Santa Felicidade", entrega:"Jun/2026", valor:350000, tipo:"", obs:"", planta:"",
-      unidades:[{n:"Casa 01",s:"disp",v:null,t:null},{n:"Casa 02",s:"disp",v:null,t:null},{n:"Casa 03",s:"vend",v:null,t:null}]}
+    {id:1,nome:"São Luís 2",endereco:"Rua Congonhas do Norte",entrega:"Dez/2025",valor:219000,tipo:"2 quartos, sala, cozinha, banheiro, 1 vaga",obs:"Documentação grátis",planta:"",unidades:[{n:"144",s:"vend",v:null,t:null},{n:"144A",s:"vend",v:null,t:null},{n:"144B",s:"disp",v:null,t:null},{n:"144C",s:"disp",v:null,t:null},{n:"144D",s:"disp",v:null,t:null},{n:"144E",s:"disp",v:null,t:null},{n:"144F",s:"disp",v:null,t:null},{n:"144G",s:"disp",v:null,t:null},{n:"144H",s:"vend",v:null,t:null},{n:"144I",s:"vend",v:null,t:null},{n:"144J",s:"vend",v:null,t:null},{n:"144K",s:"vend",v:null,t:null}]},
+    {id:2,nome:"Alvorada 5",endereco:"Rua Dilermando Reis, 116 — Alvorada",entrega:"Mar/2026",valor:289000,tipo:"2 quartos, sala, cozinha, banheiro social, 1 vaga",obs:"Documentação grátis",planta:"",unidades:[{n:"116",s:"vend",v:null,t:null},{n:"116A",s:"disp",v:null,t:null},{n:"116B",s:"disp",v:null,t:null},{n:"116C",s:"disp",v:null,t:null},{n:"116D",s:"disp",v:null,t:null},{n:"116E",s:"disp",v:null,t:null},{n:"116F",s:"disp",v:null,t:null},{n:"116G",s:"disp",v:null,t:null},{n:"116H",s:"disp",v:null,t:null}]},
+    {id:3,nome:"São Luís 3",endereco:"Rua Congonhas do Norte",entrega:"Fev/2026",valor:310000,tipo:"2 quartos, sala, cozinha, banheiro, 1 vaga",obs:"",planta:"",unidades:[{n:"Casa 01",s:"disp",v:null,t:null},{n:"Casa 02",s:"disp",v:null,t:null},{n:"Casa 03",s:"vend",v:null,t:null},{n:"Casa 04",s:"vend",v:null,t:null}]},
+    {id:4,nome:"GV4",endereco:"Rua Exemplo — Grande Vitória",entrega:"Ago/2026",valor:270000,tipo:"",obs:"",planta:"",unidades:[{n:"Casa 01",s:"disp",v:null,t:null},{n:"Casa 02",s:"vend",v:null,t:null},{n:"Casa 03",s:"disp",v:null,t:null}]},
+    {id:5,nome:"SF31",endereco:"Rua Exemplo, 31 — Santa Felicidade",entrega:"Jun/2026",valor:350000,tipo:"",obs:"",planta:"",unidades:[{n:"Casa 01",s:"disp",v:null,t:null},{n:"Casa 02",s:"disp",v:null,t:null},{n:"Casa 03",s:"vend",v:null,t:null}]}
   ];
 }
 
-window.showTab = function(t,el){
+window.showTab=function(t,el){
   document.querySelectorAll('.tab-content').forEach(function(e){e.classList.remove('active');});
   document.querySelectorAll('.tab').forEach(function(e){e.classList.remove('active');});
   document.getElementById('tab-'+t).classList.add('active');
@@ -252,41 +241,30 @@ window.showTab = function(t,el){
   if(t==='view') renderView();
 };
 
-window.abrirAdmin = function(el){
+window.abrirAdmin=function(el){
   document.querySelectorAll('.tab-content').forEach(function(e){e.classList.remove('active');});
   document.querySelectorAll('.tab').forEach(function(e){e.classList.remove('active');});
   document.getElementById('tab-admin').classList.add('active');
   el.classList.add('active');
 };
 
-window.verificaSenha = function(){
-  var s = document.getElementById('senha-input').value;
-  if(s === SENHA){
-    adminLogado = true;
-    document.getElementById('admin-login').style.display='none';
-    document.getElementById('admin-painel').style.display='block';
-    renderAdmin();
-  } else {
-    document.getElementById('login-err').textContent = 'Senha incorreta.';
-  }
+window.verificaSenha=function(){
+  var s=document.getElementById('senha-input').value;
+  if(s===SENHA){adminLogado=true;document.getElementById('admin-login').style.display='none';document.getElementById('admin-painel').style.display='block';renderAdmin();}
+  else{document.getElementById('login-err').textContent='Senha incorreta.';}
 };
 
-function fmt(v){ return "R$ "+Number(v).toLocaleString("pt-BR"); }
-function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;"); }
+function fmt(v){return "R$ "+Number(v).toLocaleString("pt-BR");}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");}
 
 function gerarUnidades(prefixo,qtd){
   var p=prefixo.trim(),uns=[];
-  if(/\d$/.test(p)){
-    uns.push({n:p,s:"disp",v:null,t:null});
-    var alpha="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    for(var i=0;i<qtd-1;i++) uns.push({n:p+alpha[i],s:"disp",v:null,t:null});
-  } else {
-    for(var i=1;i<=qtd;i++) uns.push({n:p+" "+String(i).padStart(2,"0"),s:"disp",v:null,t:null});
-  }
+  if(/\d$/.test(p)){uns.push({n:p,s:"disp",v:null,t:null});var alpha="ABCDEFGHIJKLMNOPQRSTUVWXYZ";for(var i=0;i<qtd-1;i++)uns.push({n:p+alpha[i],s:"disp",v:null,t:null});}
+  else{for(var i=1;i<=qtd;i++)uns.push({n:p+" "+String(i).padStart(2,"0"),s:"disp",v:null,t:null});}
   return uns;
 }
 
-window.addObra = function(){
+window.addObra=function(){
   var nome=document.getElementById("n-nome").value.trim();
   if(!nome){alert("Informe o nome da obra.");return;}
   var qtd=parseInt(document.getElementById("n-qtd").value)||1;
@@ -297,27 +275,25 @@ window.addObra = function(){
   renderAdmin();
 };
 
-window.remObra = function(id){ if(!confirm("Remover esta obra?"))return; obras=obras.filter(function(o){return o.id!==id;}); salvarFirebase(); renderAdmin(); };
-window.editCampo = function(id,campo,val){ var o=obras.find(function(o){return o.id===id;}); if(!o)return; o[campo]=campo==="valor"?parseFloat(val)||0:val; salvarFirebase(); };
-window.toggleUnit = function(oid,ui){ var o=obras.find(function(o){return o.id===oid;}); if(!o)return; o.unidades[ui].s=o.unidades[ui].s==="disp"?"vend":"disp"; salvarFirebase(); renderAdmin(); };
-window.remUnit = function(oid,ui){ var o=obras.find(function(o){return o.id===oid;}); o.unidades.splice(ui,1); salvarFirebase(); renderAdmin(); };
-window.editUnitVal = function(oid,ui,val){ var o=obras.find(function(o){return o.id===oid;}); if(!o)return; var v=parseFloat(val); o.unidades[ui].v=isNaN(v)||v===0?null:v; salvarFirebase(); };
-window.editUnitNome = function(oid,ui,val){ var o=obras.find(function(o){return o.id===oid;}); if(!o)return; o.unidades[ui].n=val; salvarFirebase(); };
-window.editUnitTipo = function(oid,ui,val){ var o=obras.find(function(o){return o.id===oid;}); if(!o)return; o.unidades[ui].t=val||null; salvarFirebase(); };
+window.remObra=function(id){if(!confirm("Remover esta obra?"))return;obras=obras.filter(function(o){return o.id!==id;});salvarFirebase();renderAdmin();};
+window.editCampo=function(id,campo,val){var o=obras.find(function(o){return o.id===id;});if(!o)return;o[campo]=campo==="valor"?parseFloat(val)||0:val;salvarFirebase();};
+window.toggleUnit=function(oid,ui){var o=obras.find(function(o){return o.id===oid;});if(!o)return;o.unidades[ui].s=o.unidades[ui].s==="disp"?"vend":"disp";salvarFirebase();renderAdmin();};
+window.remUnit=function(oid,ui){var o=obras.find(function(o){return o.id===oid;});o.unidades.splice(ui,1);salvarFirebase();renderAdmin();};
+window.editUnitVal=function(oid,ui,val){var o=obras.find(function(o){return o.id===oid;});if(!o)return;var v=parseFloat(val);o.unidades[ui].v=isNaN(v)||v===0?null:v;salvarFirebase();};
+window.editUnitNome=function(oid,ui,val){var o=obras.find(function(o){return o.id===oid;});if(!o)return;o.unidades[ui].n=val;salvarFirebase();};
+window.editUnitTipo=function(oid,ui,val){var o=obras.find(function(o){return o.id===oid;});if(!o)return;o.unidades[ui].t=val||null;salvarFirebase();};
 
-window.addUnit = function(oid){
-  var inp=document.getElementById("nu-"+oid);
-  var nome=inp?inp.value.trim():"";
+window.addUnit=function(oid){
+  var inp=document.getElementById("nu-"+oid);var nome=inp?inp.value.trim():"";
   if(!nome){alert("Informe o número/nome da unidade.");return;}
   var o=obras.find(function(o){return o.id===oid;});
-  o.unidades.push({n:nome,s:"disp",v:null,t:null});
-  salvarFirebase(); renderAdmin();
+  o.unidades.push({n:nome,s:"disp",v:null,t:null});salvarFirebase();renderAdmin();
 };
 
-window.remPlanta = function(oid){ var o=obras.find(function(o){return o.id===oid;}); o.planta=""; salvarFirebase(); renderAdmin(); };
+window.remPlanta=function(oid){var o=obras.find(function(o){return o.id===oid;});o.planta="";salvarFirebase();renderAdmin();};
 
-window.uploadPlanta = function(oid,input){
-  var file=input.files[0]; if(!file)return;
+window.uploadPlanta=function(oid,input){
+  var file=input.files[0];if(!file)return;
   var statusEl=document.getElementById("planta-status-"+oid);
   if(file.type==="application/pdf"){
     if(statusEl)statusEl.textContent="Convertendo PDF...";
@@ -326,23 +302,20 @@ window.uploadPlanta = function(oid,input){
       var pdfData=new Uint8Array(e.target.result);
       pdfjsLib.getDocument({data:pdfData}).promise.then(function(pdf){return pdf.getPage(1);}).then(function(page){
         var scale=2.0,viewport=page.getViewport({scale:scale});
-        var canvas=document.createElement('canvas');
-        canvas.width=viewport.width; canvas.height=viewport.height;
+        var canvas=document.createElement('canvas');canvas.width=viewport.width;canvas.height=viewport.height;
         return page.render({canvasContext:canvas.getContext('2d'),viewport:viewport}).promise.then(function(){return canvas.toDataURL('image/jpeg',0.85);});
-      }).then(function(imgData){
-        var o=obras.find(function(o){return o.id===oid;}); o.planta=imgData; salvarFirebase(); renderAdmin();
+      }).then(function(imgData){var o=obras.find(function(o){return o.id===oid;});o.planta=imgData;salvarFirebase();renderAdmin();
       }).catch(function(err){if(statusEl)statusEl.textContent="Erro: "+err.message;});
-    };
-    reader.readAsArrayBuffer(file);
+    };reader.readAsArrayBuffer(file);
   } else {
     var reader=new FileReader();
-    reader.onload=function(e){var o=obras.find(function(o){return o.id===oid;}); o.planta=e.target.result; salvarFirebase(); renderAdmin();};
+    reader.onload=function(e){var o=obras.find(function(o){return o.id===oid;});o.planta=e.target.result;salvarFirebase();renderAdmin();};
     reader.readAsDataURL(file);
   }
 };
 
-function getVal(u,def){ return (u.v!==null&&u.v!==undefined)?u.v:def; }
-function getTipo(u,def){ return (u.t!==null&&u.t!==undefined&&u.t!=='')?u.t:def; }
+function getVal(u,def){return(u.v!==null&&u.v!==undefined)?u.v:def;}
+function getTipo(u,def){return(u.t!==null&&u.t!==undefined&&u.t!=='')?u.t:def;}
 
 function renderAdmin(){
   var html="";
@@ -386,8 +359,7 @@ function renderView(){
     var disp=o.unidades.filter(function(u){return u.s==="disp";}).length;
     var vend=o.unidades.length-disp;
     var units=o.unidades.map(function(u){
-      var val=getVal(u,o.valor);
-      var tipo=getTipo(u,o.tipo);
+      var val=getVal(u,o.valor);var tipo=getTipo(u,o.tipo);
       return '<div class="v-unit '+u.s+'">'+
         '<div class="v-unit-num">'+u.n+'</div>'+
         (val?'<div class="v-unit-val">'+fmt(val)+'</div>':'')+
