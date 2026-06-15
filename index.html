@@ -417,15 +417,28 @@ window.fecharModal=function(){
 };
 window.enviarWhats=function(numero,nome){
   var empr=document.getElementById('p-empr').value;
+  var unidade=document.getElementById('p-unidade').value;
+  var corretor=document.getElementById('p-corretor').value;
+  var cliente=document.getElementById('p-cliente').value;
+  var valor=document.getElementById('p-valor').value;
+  var avaliacao=document.getElementById('p-avaliacao').value;
+  var financiamento=document.getElementById('p-financiamento').value;
+  var sinal=document.getElementById('p-sinal').value;
+  var parcelas=document.getElementById('p-parcelas').value;
+  var obs=document.getElementById('p-obs').value;
   var msg='📋 *PROPOSTA DE COMPRA — TMX Incorporações*\n\n'
     +'🏘️ *Empreendimento:* '+empr+'\n'
-    +'🏠 *Unidade:* '+(document.getElementById('p-unidade').value||'Não informada')+'\n'
-    +'👤 *Corretor:* '+(document.getElementById('p-corretor').value||'Não informado')+'\n'
-    +'👥 *Cliente:* '+(document.getElementById('p-cliente').value||'Não informado')+'\n'
-    +'💰 *Valor proposto:* '+(document.getElementById('p-valor').value||'Não informado')+'\n'
-    +'💳 *Forma de pagamento:* '+(document.getElementById('p-pagto').value||'Não informado')+'\n'
-    +'📝 *Observações:* '+(document.getElementById('p-obs').value||'-')+'\n\n'
-    +'_Enviado pelo sistema de disponibilidade TMX_';
+    +'🏠 *Unidade:* '+(unidade||'Não informada')+'\n'
+    +'👤 *Corretor:* '+(corretor||'Não informado')+'\n'
+    +'👥 *Cliente:* '+(cliente||'Não informado')+'\n\n'
+    +'💰 *VALORES*\n'
+    +(valor?'🏷️ Valor proposto: '+valor+'\n':'')
+    +(avaliacao?'📊 Avaliação: '+avaliacao+'\n':'')
+    +(financiamento?'🏦 Financiamento: '+financiamento+'\n':'')
+    +(sinal?'✍️ Sinal: '+sinal+'\n':'')
+    +(parcelas?'\n💳 *Forma de pagamento:*\n'+parcelas+'\n':'')
+    +(obs?'\n📝 *Observações:*\n'+obs+'\n':'')
+    +'\n_Enviado pelo sistema de disponibilidade TMX_';
   window.open('https://wa.me/'+numero+'?text='+encodeURIComponent(msg),'_blank');
 };
 
