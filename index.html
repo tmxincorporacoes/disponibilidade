@@ -112,7 +112,7 @@ textarea{resize:vertical;min-height:80px;}
 .v-unidades{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
 .v-unit{min-width:84px;padding:8px 10px;border-radius:10px;text-align:center;transition:transform 0.15s;position:relative;}
 .v-unit.has-fotos{cursor:pointer;}
-.v-unit-foto-badge{position:absolute;top:4px;right:4px;background:rgba(30,58,95,0.85);color:#fff;border-radius:6px;font-size:10px;padding:2px 5px;display:flex;align-items:center;gap:2px;font-weight:600;}
+.v-unit-foto-badge{margin-top:5px;background:#1e3a5f;color:#fff;border-radius:20px;font-size:11px;padding:3px 10px;display:inline-flex;align-items:center;gap:4px;font-weight:600;}
 .v-unit:hover{transform:scale(1.03);}
 .v-unit.disp{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;}
 .v-unit.vend{background:linear-gradient(135deg,#fef2f2,#fee2e2);border:1.5px solid #fca5a5;}
@@ -688,9 +688,9 @@ function renderView(){
       var stLabel=u.s==="disp"?"Disponível":(u.s==="res"?"Reservada":"Vendida");
       var resDataHtml=(u.s==="res"&&u.resData)?'<div class="v-unit-resdata">até '+formatDataBR(u.resData)+'</div>':'';
       var temFotos=u.fotos&&u.fotos.length>0;
-      var fotoBadge=temFotos?'<div class="v-unit-foto-badge">&#128247; '+u.fotos.length+'</div>':'';
+      var fotoBadge=temFotos?'<div class="v-unit-foto-badge">&#128247; Ver fotos ('+u.fotos.length+')</div>':'';
       var clickAttr=temFotos?(' onclick="abrirGaleriaUnidade('+oi+','+ui+')"'):'';
-      return '<div class="v-unit '+u.s+(temFotos?' has-fotos':'')+'"'+clickAttr+'>'+fotoBadge+'<div class="v-unit-num">'+u.n+'</div>'+(val?'<div class="v-unit-val">'+fmt(val)+'</div>':'')+(tipo?'<div class="v-unit-tipo">'+esc(tipo)+'</div>':'')+'<div class="v-unit-st">'+stLabel+'</div>'+resDataHtml+'</div>';
+      return '<div class="v-unit '+u.s+(temFotos?' has-fotos':'')+'"'+clickAttr+'><div class="v-unit-num">'+u.n+'</div>'+(val?'<div class="v-unit-val">'+fmt(val)+'</div>':'')+(tipo?'<div class="v-unit-tipo">'+esc(tipo)+'</div>':'')+'<div class="v-unit-st">'+stLabel+'</div>'+resDataHtml+fotoBadge+'</div>';
     }).join("");
 
     var fotosJson=JSON.stringify(o.fotos).replace(/"/g,"&quot;");
