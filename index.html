@@ -685,6 +685,32 @@ window.uploadPlanta=function(oid,input){
   }else{var r=new FileReader();r.onload=function(e){var o=obras.find(function(o){return o.id===oid;});o.planta=e.target.result;salvarFB();renderAdmin();};r.readAsDataURL(file);}
 };
 
+function gerarTagField(o){
+  var emojis=['🔥','⭐','🎯','✅','🆕','💥','💰','🏆','🚀','📢','⚡','🎁','🌟','💎','🏠'];
+  var eid='tag-input-'+o.id;
+  var sel='<select style="width:150px" onchange="editCampo('+o.id+',\'tagCor\',this.value)">'
+    +'<option value=""'+((!o.tagCor||o.tagCor==='')?'  selected':'')+'>Sem cor</option>'
+    +'<option value="amarelo"'+(o.tagCor==='amarelo'?' selected':'')+'>🟡 Amarelo</option>'
+    +'<option value="azul"'+(o.tagCor==='azul'?' selected':'')+'>🔵 Azul</option>'
+    +'<option value="verde"'+(o.tagCor==='verde'?' selected':'')+'>🟢 Verde</option>'
+    +'<option value="vermelho"'+(o.tagCor==='vermelho'?' selected':'')+'>🔴 Vermelho</option>'
+    +'<option value="laranja"'+(o.tagCor==='laranja'?' selected':'')+'>🟠 Laranja</option>'
+    +'</select>';
+  var inp='<input type="text" id="'+eid+'" value="'+esc(o.tag||'')+'" placeholder="Ex: 🔥 Imperdível!" style="flex:1" onchange="editCampo('+o.id+',\'tag\',this.value)">';
+  var epicks=emojis.map(function(e){
+    return '<button type="button" class="emoji-btn" onclick="insTag('+o.id+',\''+e+'\')" title="'+e+'">'+e+'</button>';
+  }).join('');
+  return '<div class="field-row full"><div><label>🏷️ Tag de destaque por obra</label>'
+    +'<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">'+inp+sel+'</div>'
+    +'<div class="emoji-picker">'+epicks+'</div>'
+    +'</div></div>';
+}
+window.insTag=function(oid,emoji){
+  var o=obras.find(function(x){return x.id===oid;});
+  if(!o)return;
+  o.tag=(o.tag||'')+emoji;
+  salvarFB();renderAdmin();
+};
 function renderAdmin(){
   var html="";
   (obras||[]).filter(function(o){return o&&o.unidades;}).forEach(function(o){
