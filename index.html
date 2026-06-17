@@ -189,6 +189,9 @@ textarea{resize:vertical;min-height:80px;}
 .lightbox-counter{color:rgba(255,255,255,0.6);font-size:12px;text-align:center;margin-top:6px;}
 
 .v-footer{text-align:center;font-size:11px;color:#94a3b8;padding:20px;margin-top:8px;}
+.emoji-picker{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.emoji-btn{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:18px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;transition:background 0.15s;}
+.emoji-btn:hover{background:#eff6ff;border-color:#93c5fd;}
 
 /* BANNER GERAL */
 .v-banner{border-radius:12px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 10px rgba(0,0,0,0.08);}
@@ -718,6 +721,24 @@ function renderAdmin(){
       '<div class="field-row"><div><label>Nome</label><input type="text" value="'+esc(o.nome)+'" onchange="editCampo('+o.id+',\'nome\',this.value);renderAdmin()"></div><div><label>Endereço</label><input type="text" value="'+esc(o.endereco)+'" onchange="editCampo('+o.id+',\'endereco\',this.value)"></div></div>'+
       '<div class="field-row three"><div><label>Entrega</label><input type="text" value="'+esc(o.entrega)+'" onchange="editCampo('+o.id+',\'entrega\',this.value)"></div><div><label>Valor padrão</label><input type="number" value="'+o.valor+'" onchange="editCampo('+o.id+',\'valor\',this.value)"></div><div><label>Qtd</label><input type="text" readonly value="'+o.unidades.length+'" style="background:#f8fafc"></div></div>'+
       '<div class="field-row"><div><label>Tipologia padrão</label><input type="text" value="'+esc(o.tipo||'')+'" onchange="editCampo('+o.id+',\'tipo\',this.value)"></div><div><label>Observação</label><input type="text" value="'+esc(o.obs||'')+'" onchange="editCampo('+o.id+',\'obs\',this.value)"></div></div>'+
+      '<div class="field-row full"><div><label>🏷️ Tag de destaque por obra</label>'+
+        '<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">'+
+          '<input type="text" id="tag-input-'+o.id+'" value="'+esc(o.tag||'')+'" placeholder="Ex: 🔥 Imperdível!" style="flex:1" onchange="editCampo('+o.id+',\'tag\',this.value)">'+
+          '<select style="width:150px" onchange="editCampo('+o.id+',\'tagCor\',this.value)">'+
+            '<option value=""'+((!o.tagCor||o.tagCor==='')?\' selected\':\'')+'\'>Sem cor</option>'+
+            '<option value="amarelo"'+(o.tagCor==="amarelo"?\'selected\':\'')+'\'>🟡 Amarelo</option>'+
+            '<option value="azul"'+(o.tagCor==="azul"?\'selected\':\'')+'\'>🔵 Azul</option>'+
+            '<option value="verde"'+(o.tagCor==="verde"?\'selected\':\'')+'\'>🟢 Verde</option>'+
+            '<option value="vermelho"'+(o.tagCor==="vermelho"?\'selected\':\'')+'\'>🔴 Vermelho</option>'+
+            '<option value="laranja"'+(o.tagCor==="laranja"?\'selected\':\'')+'\'>🟠 Laranja</option>'+
+          '</select>'+
+        '</div>'+
+        '<div class="emoji-picker">'+
+          ['🔥','⭐','🎯','✅','🏷️','🆕','💥','💰','🏆','🚀','📢','⚡','🎁','🌟','💎','🔑','🏠','📍','🗓️','💡'].map(function(e){
+            return \'<button type="button" class="emoji-btn" onclick="document.getElementById(\\\'tag-input-'+o.id+'\\\').value+=\\\''+e+'\\\';editCampo('+o.id+',\\\'tag\\\',document.getElementById(\\\'tag-input-'+o.id+'\\\').value)" title="\''+e+\'\">\'+e+\'</button>\';
+          }).join(\'\'))+
+        '</div>'+
+      '</div></div>'+
       '<label style="margin-bottom:6px;display:block;margin-top:4px">Unidades</label>'+
       '<table class="unidades-table"><thead><tr><th>Unidade</th><th>Status (clique: Disponível → Reservada → Vendida)</th><th>Valor individual</th><th>Tipologia individual</th><th>Fotos</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>'+
       '<div class="add-unit-row"><input type="text" id="nu-'+o.id+'" placeholder="Número/nome" onkeydown="if(event.key===\'Enter\')addUnit('+o.id+')"><button class="btn btn-green btn-sm" onclick="addUnit('+o.id+')">+ Unidade</button></div>'+
