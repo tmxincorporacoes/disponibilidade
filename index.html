@@ -562,7 +562,8 @@ window.editResData=function(oid,ui,val){var o=obras.find(function(o){return o.id
 window.remUnit=function(oid,ui){var o=obras.find(function(o){return o.id===oid;});o.unidades.splice(ui,1);salvarFB();renderAdmin();};
 window.editUnitVal=function(oid,ui,val){var o=obras.find(function(o){return o.id===oid;});if(!o)return;var v=parseFloat(val);o.unidades[ui].v=isNaN(v)||v===0?null:v;salvarFB();};
 window.editUnitNome=function(oid,ui,val){var o=obras.find(function(o){return o.id===oid;});if(!o)return;o.unidades[ui].n=val;salvarFB();};
-window.editUnitTipo=function(oid,ui,val){var o=obras.find(function(o){return o.id===oid;});if(!o)return;o.unidades[ui].t=val||null;salvarFB();};
+window.editUnitTipo=function(oid,ui,val){var o=obras.find(function(o){return o.id===oid;});if(!o)return;var v=val&&val.trim();o.unidades[ui].t=(v&&v!==o.tipo)?v:null;salvarFB();};
+window.clearUnitTipo=function(oid,ui){var o=obras.find(function(o){return o.id===oid;});if(!o)return;o.unidades[ui].t=null;salvarFB();renderAdmin();};
 window.addUnit=function(oid){var inp=document.getElementById("nu-"+oid),nome=inp?inp.value.trim():"";if(!nome){alert("Informe o nome.");return;}var o=obras.find(function(o){return o.id===oid;});o.unidades.push({n:nome,s:"disp",v:null,t:null});salvarFB();renderAdmin();};
 window.remPlanta=function(oid){var o=obras.find(function(o){return o.id===oid;});o.planta="";salvarFB();renderAdmin();};
 
@@ -697,7 +698,7 @@ function renderAdmin(){
       return '<tr><td><input type="text" style="width:85px;padding:4px 7px;font-size:12px" value="'+esc(u.n)+'" onchange="editUnitNome('+o.id+','+ui+',this.value)"></td>'+
         '<td><button class="unit-toggle '+u.s+'" onclick="toggleUnit('+o.id+','+ui+')">'+stLabel+'</button>'+resDateField+'</td>'+
         '<td><input class="unit-val-input" type="number" value="'+(u.v!==null&&u.v!==undefined?u.v:'')+'" placeholder="'+o.valor+'" onchange="editUnitVal('+o.id+','+ui+',this.value)"><span class="hint">vazio=padrão</span></td>'+
-        '<td><input type="text" style="width:160px;padding:4px 7px;font-size:12px" value="'+esc(u.t||'')+'" placeholder="'+esc(o.tipo||'')+'" onchange="editUnitTipo('+o.id+','+ui+',this.value)"><span class="hint">vazio=padrão</span></td>'+
+        '<td><div style="display:flex;align-items:center;gap:4px"><input type="text" style="width:140px;padding:4px 7px;font-size:12px" value="'+(u.t&&u.t!==o.tipo?esc(u.t):'')+'" placeholder="'+esc(o.tipo||'')+'" onchange="editUnitTipo('+o.id+','+ui+',this.value)"><button type="button" title="Limpar tipologia individual" onclick="clearUnitTipo('+o.id+','+ui+')" style="background:#fee2e2;border:1px solid #fca5a5;border-radius:4px;padding:2px 6px;cursor:pointer;font-size:11px;color:#b91c1c;flex-shrink:0">✕</button></div><span class="hint">vazio=padrão</span></td>'+
         '<td>'+fotosBtn+'</td>'+
         '<td><button class="btn btn-red btn-sm" onclick="remUnit('+o.id+','+ui+')">&#10005;</button></td></tr>';
     }).join("");
