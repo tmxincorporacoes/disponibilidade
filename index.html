@@ -311,6 +311,7 @@ textarea{resize:vertical;min-height:80px;}
     <div class="login-box">
       <div class="login-icon">&#128274;</div>
       <h2>Área de edição</h2>
+      <button class="btn" onclick="limparTipologiasIguais()" style="margin-top:8px;font-size:12px;padding:6px 12px;background:#fef3c7;border:1px solid #fbbf24;color:#92400e;border-radius:6px;cursor:pointer">🧹 Limpar tipologias iguais ao padrão</button>
       <p>Digite a senha para acessar o painel</p>
       <input type="password" id="senha-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')verificaSenha()">
       <button onclick="verificaSenha()">Entrar</button>
@@ -419,18 +420,7 @@ onValue(dbRef,function(snap){
   var d=snap.val();
   if(d){var raw=Array.isArray(d)?d:Object.values(d);obras=raw.filter(function(o){return o&&o.id;});nextId=obras.reduce(function(m,o){return Math.max(m,o.id||0);},0)+1;}
   else{obras=dadosIniciais();salvarFB();}
-  // Limpar u.t igual ao padrão da obra (dados legados do Firebase)
-  var precisaSalvar=false;
-  obras.forEach(function(o){
-    if(!o.unidades||!o.tipo)return;
-    var pad=o.tipo.trim();
-    o.unidades.forEach(function(u){
-      if(u.t&&u.t.trim()===pad){u.t=null;precisaSalvar=true;}
-      // também limpa se começa com o padrão (texto truncado pelo input)
-      else if(u.t&&pad.indexOf(u.t.trim())===0&&u.t.trim().length>10){u.t=null;precisaSalvar=true;}
-    });
-  });
-  if(precisaSalvar)salvarFB();
+
   renderView();if(adminLogado)renderAdmin();
   setSS('● Ao vivo','sync-ok');
 });
@@ -576,6 +566,23 @@ window.editUnitVal=function(oid,ui,val){var o=obras.find(function(o){return o.id
 window.editUnitNome=function(oid,ui,val){var o=obras.find(function(o){return o.id===oid;});if(!o)return;o.unidades[ui].n=val;salvarFB();};
 window.editUnitTipo=function(oid,ui,val){var o=obras.find(function(o){return o.id===oid;});if(!o)return;var v=val&&val.trim();o.unidades[ui].t=(v&&v!==o.tipo)?v:null;salvarFB();};
 window.clearUnitTipo=function(oid,ui){var o=obras.find(function(o){return o.id===oid;});if(!o)return;o.unidades[ui].t=null;salvarFB();renderAdmin();};
+window.limparTipologiasIguais=function(){
+  var total=0;
+  obras.forEach(function(o){
+    if(!o.unidades||!o.tipo)return;
+    var pad=o.tipo.trim();
+    o.unidades.forEach(function(u){
+      if(u.t){
+        var ut=u.t.trim();
+        if(ut===pad||pad.startsWith(ut)||ut.startsWith(pad)){
+          u.t=null;total++;
+        }
+      }
+    });
+  });
+  if(total>0){salvarFB();renderAdmin();alert(total+' tipologia(s) igual(is) ao padrão foram limpas.');}
+  else{alert('Nenhuma tipologia igual ao padrão encontrada.');}
+};
 window.addUnit=function(oid){var inp=document.getElementById("nu-"+oid),nome=inp?inp.value.trim():"";if(!nome){alert("Informe o nome.");return;}var o=obras.find(function(o){return o.id===oid;});o.unidades.push({n:nome,s:"disp",v:null,t:null});salvarFB();renderAdmin();};
 window.remPlanta=function(oid){var o=obras.find(function(o){return o.id===oid;});o.planta="";salvarFB();renderAdmin();};
 
