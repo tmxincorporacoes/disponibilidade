@@ -311,7 +311,6 @@ textarea{resize:vertical;min-height:80px;}
     <div class="login-box">
       <div class="login-icon">&#128274;</div>
       <h2>Área de edição</h2>
-      <button class="btn" onclick="limparTipologiasIguais()" style="margin-top:8px;font-size:12px;padding:6px 12px;background:#fef3c7;border:1px solid #fbbf24;color:#92400e;border-radius:6px;cursor:pointer">🧹 Limpar tipologias iguais ao padrão</button>
       <p>Digite a senha para acessar o painel</p>
       <input type="password" id="senha-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')verificaSenha()">
       <button onclick="verificaSenha()">Entrar</button>
@@ -319,6 +318,7 @@ textarea{resize:vertical;min-height:80px;}
     </div>
   </div>
   <div id="admin-painel" style="display:none">
+    <div style="text-align:right;padding:8px 0 4px"><button onclick="limparTipologiasIguais()" style="font-size:12px;padding:6px 12px;background:#fef3c7;border:1px solid #fbbf24;color:#92400e;border-radius:6px;cursor:pointer">🧹 Limpar tipologias iguais ao padrão</button></div>
     <div class="admin">
       <div class="card">
         <div class="card-head"><h2>&#43; Nova obra</h2></div>
